@@ -72,35 +72,49 @@
 		</div>
 		<div class="timeButtons" style="margin-top: 30px">
 			<div>Schedule:</div>
-			<button class="w3-btn w3-grey" onclick="turnOn(300)">5 minutes</button>
-			<button class="w3-btn w3-grey" onclick="turnOn(600)">10 minutes</button>
-			<button class="w3-btn w3-light-green" onclick="turnOn(1800)">30 minutes</button>
+			<button class="w3-btn w3-grey" id="sD300">5 minutes</button>
+			<button class="w3-btn w3-grey" id="sD600">10 minutes</button>
+			<button class="w3-btn w3-grey" id="sD1800">30 minutes</button>
 			<div class="scheduleTimes">
 				<div>
-					<button class="w3-btn w3-grey" onclick="toggleSchedule(0)">00:00</button>
-					<button class="w3-btn w3-grey" onclick="toggleSchedule(2)">02:00</button>
-					<button class="w3-btn w3-grey" onclick="toggleSchedule(4)">04:00</button>
+					<button class="w3-btn w3-grey" id="s0">00:00</button>
+					<button class="w3-btn w3-grey" id="s2">02:00</button>
+					<button class="w3-btn w3-grey" id="s4">04:00</button>
 				</div>
 				<div>
-					<button class="w3-btn w3-grey" onclick="toggleSchedule(6)">06:00</button>
-					<button class="w3-btn w3-grey" onclick="toggleSchedule(8)">08:00</button>
-					<button class="w3-btn w3-grey" onclick="toggleSchedule(10)">10:00</button>
+					<button class="w3-btn w3-grey" id="s6">06:00</button>
+					<button class="w3-btn w3-grey" id="s8">08:00</button>
+					<button class="w3-btn w3-grey" id="s10">10:00</button>
 				</div>
 				<div>
-					<button class="w3-btn w3-grey" onclick="toggleSchedule(12)">12:00</button>
-					<button class="w3-btn w3-grey" onclick="toggleSchedule(14)">14:00</button>
-					<button class="w3-btn w3-grey" onclick="toggleSchedule(16)">16:00</button>
+					<button class="w3-btn w3-grey" id="s12">12:00</button>
+					<button class="w3-btn w3-grey" id="s14">14:00</button>
+					<button class="w3-btn w3-grey" id="s16">16:00</button>
 				</div>
 				<div>
-					<button class="w3-btn w3-grey" onclick="toggleSchedule(18)">18:00</button>
-					<button class="w3-btn w3-grey" onclick="toggleSchedule(20)">20:00</button>
-					<button class="w3-btn w3-grey" onclick="toggleSchedule(22)">22:00</button>
+					<button class="w3-btn w3-grey" id="s18">18:00</button>
+					<button class="w3-btn w3-grey" id="s20">20:00</button>
+					<button class="w3-btn w3-grey" id="s22">22:00</button>
 				</div>
 			</div>
 		</div>
 		<div id="toast"></div>
 	</body>
 	<script>
+		Node.prototype.changeStyles = function (active) {
+			this.classList.add(active ? "w3-light-green" : "w3-grey");
+			this.classList.remove(active ? "w3-grey" : "w3-light-green");
+		}
+
+		Array.prototype.equals = function (array) {
+			if (!array) return false;
+			if (this.length != array.length) return false;
+			for (let i = 0; i < this.length; i++) {
+				if (this[i] !== array[i]) return false
+			}
+			return true;
+		}
+
 		/**
 		 * A simple pop up message, inspired by Android Studio's Toast. This is implemented so that it's dead simple, and you only
 		 * have to call .display(content) to display it.
@@ -134,13 +148,43 @@
         /** @type {Toast} toast */ const toast = new Toast();
 
         const dev = true;
-		const status = document.querySelector("#status");
+        const elem = (id) => document.querySelector("#" + id);
+        const range = (n, step=1) => {
+        	const answer = [];
+        	for (let i = 0; i < n; i+=step) answer.push(i)
+        	return answer;
+        }
+        const sD300 = elem("sD300");
+        const sD600 = elem("sD600");
+        const sD1800 = elem("sD1800");
+        const s = [
+	        elem("s0"), 0, elem("s2"), 0, elem("s4"), 0, elem("s6"), 0,
+	        elem("s8"), 0, elem("s10"), 0, elem("s12"), 0, elem("s14"), 0,
+	        elem("s16"), 0, elem("s18"), 0, elem("s20"), 0, elem("s22"), 0]
+
+		const status = elem("status");
 		let lastClock = Date.now() / 1000;
 		let state = {
 			"value": 0, // 0: off, 1: on
 			"remaining": 0, // remaining seconds before switching off
-			"schedule": [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
+			"schedule": [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,0],
+			"scheduleDuration": 0
 		};
+
+		for (const hourWindow of range(24, 2)) 
+			s[hourWindow].onclick = changeSchedule(hourWindow);
+		sD300.onclick = changeScheduleDuration(300);
+		sD600.onclick = changeScheduleDuration(600);
+		sD1800.onclick = changeScheduleDuration(1800);
+
+	    const updateScheduleUI = () => {
+		    for (const hourWindow of range(24, 2))
+		    	s[hourWindow].changeStyles(state.schedule[hourWindow * 2] === 1);
+		    sD300.changeStyles(state.scheduleDuration === 300);
+		    sD600.changeStyles(state.scheduleDuration === 600);
+		    sD1800.changeStyles(state.scheduleDuration === 1800);
+	    }
+	    updateScheduleUI();
 
 		setInterval(() => {
 			const now = Date.now() / 1000;
@@ -149,7 +193,9 @@
 		}, 1000);
 
 		const update = (_state) => {
+			const scheduleChanged = !state.schedule.equals(_state.schedule);
 			state = {...state, ..._state}
+			if (scheduleChanged) updateScheduleUI();
 			if (state.remaining > 0) {
 				const minutes = Math.floor(state.remaining / 60)
 				const seconds = Math.floor(state.remaining % 60)
@@ -167,8 +213,10 @@
 				}
 			});
 		}
-		const turnOff = () => get("turnOff")
-		const turnOn = (seconds) => get("turnOn/" + seconds)
+		const turnOff = () => get("turnOff");
+		const turnOn = (seconds) => get("turnOn/" + seconds);
+		const changeSchedule = (hourWindow) => get("/changeSchedule/" + hourWindow);
+		const changeScheduleDuration = (seconds) => get("/changeScheduleDuration/" + seconds);
 		setInterval(() => get("state", false), 5000);
 		get("state", false);
 	</script>
