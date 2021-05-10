@@ -29,12 +29,12 @@ def getState(): return json.dumps(state)
 
 @app.route("/turnOn/<int:seconds>")
 def turnOn(seconds):
-	state["remaining"] = seconds
+    state["remaining"] = seconds
     on(); return getState()
 
 @app.route("/turnOff")
 def turnOff():
-	state["remaining"] = -1
+    state["remaining"] = -1
     off(); return getState()
 
 @app.route("/changeSchedule/<int:hourWindow>")
@@ -48,7 +48,7 @@ def changeScheduleDuration(seconds):
 	saveStore(); return getState()
 
 @app.route("/")
-def site(): return site
+def getSite(): return site
 
 def clock():
     global lastClock; now = time.time()

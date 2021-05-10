@@ -7,7 +7,7 @@ def error(message):
 
 def replaceInFile(file, _from, _to):
 	f = open(file)
-	data = f.read().replace(_from, _to)
+	data = f.read().replace(str(_from), str(_to))
 	f.close()
 
 	f = open(file, "w")
@@ -19,7 +19,7 @@ repoDir = "/home/pi/repos/garden"
 if os.getcwd() != repoDir: error(f"Current working directory is not {repoDir}")
 if os.system("crontab cron.txt"): error("Something gone wrong while installing crontab")
 replaceInFile(f"{repoDir}/startup", "PORT", int(input("\nChoose a remote port: ")))
-replaceInFile(f"{repoDir}/startup", "SERVER", int(input("\nMake sure you have your ssh key files ready and you can access the server normally before continuing...\nChoose a server (eg. user@company.com): ")))
+replaceInFile(f"{repoDir}/startup", "SERVER", input("\nMake sure you have your ssh key files ready and you can access the server normally before continuing...\nChoose a server (eg. user@company.com): "))
 print("""All done. Now it will automatically run right after boot. To run now without rebooting, execute ./startup
 
 Reminders:
