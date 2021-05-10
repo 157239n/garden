@@ -72,6 +72,7 @@
 		</div>
 		<div class="timeButtons" style="margin-top: 30px">
 			<div>Schedule:</div>
+			<button class="w3-btn w3-grey" id="sD60">1 minute</button>
 			<button class="w3-btn w3-grey" id="sD300">5 minutes</button>
 			<button class="w3-btn w3-grey" id="sD600">10 minutes</button>
 			<button class="w3-btn w3-grey" id="sD1800">30 minutes</button>
@@ -156,6 +157,7 @@
         	return answer;
         }
         const sD0 = elem("sD0");
+		const sD60 = elem("sD60");
         const sD300 = elem("sD300");
         const sD600 = elem("sD600");
         const sD1800 = elem("sD1800");
@@ -172,6 +174,7 @@
 		    for (const hourWindow of range(24, 2))
 		    	s[hourWindow].changeStyles(state.schedule[hourWindow] === 1);
 		    sD0.changeStyles(state.scheduleDuration === 0);
+		    sD60.changeStyles(state.scheduleDuration === 60);
 		    sD300.changeStyles(state.scheduleDuration === 300);
 		    sD600.changeStyles(state.scheduleDuration === 600);
 		    sD1800.changeStyles(state.scheduleDuration === 1800);
@@ -213,6 +216,7 @@
 		for (const hourWindow of range(24, 2)) 
 			s[hourWindow].onclick = () => changeSchedule(hourWindow);
 		sD0.onclick = () => changeScheduleDuration(0);
+		sD60.onclick = () => changeScheduleDuration(60);
 		sD300.onclick = () => changeScheduleDuration(300);
 		sD600.onclick = () => changeScheduleDuration(600);
 		sD1800.onclick = () => changeScheduleDuration(1800);
