@@ -1,14 +1,20 @@
-import time, threading, json
+import time, threading, json, os
 from flask import Flask
 from gpiozero import LED
+
+os.chdir("/home/pi/repos/garden")
+
+def replaceInFile(file, _from, _to):
+    with open(file) as f: data = f.read().replace(str(_from), str(_to))
+    with open(file, "w") as f: f.write(data)
 
 app = Flask(__name__)
 with open("store") as f: store = [int(elem) for elem in f.readline().strip().split(" ")]
 state = {
-	"value": 0,
-	"remaining": -1, # remaining seconds before switching off
-	"schedule": store[:24],
-	"scheduleDuration": store[24]
+    "value": 0,
+    "remaining": -1, # remaining seconds before switching off
+    "schedule": store[:24],
+    "scheduleDuration": store[24]
 }
 lastClock = time.time() # seconds
 with open("site.html") as f: site = f.read()
@@ -39,16 +45,16 @@ def turnOff():
 
 @app.route("/changeSchedule/<int:hourWindow>")
 def changeSchedule(hourWindow):
-	state["schedule"][hourWindow] = 1 - state["schedule"][hourWindow]
-	saveStore(); return getState()
+    state["schedule"][hourWindow] = 1 - state["schedule"][hourWindow]
+    saveStore(); return getState()
 
 @app.route("/changeScheduleDuration/<int:seconds>")
 def changeScheduleDuration(seconds):
-	state["scheduleDuration"] = seconds
-	saveStore(); return getState()
+    state["scheduleDuration"] = seconds
+    saveStore(); return getState()
 
 @app.route("/")
-def getSite(): return site
+def getSite(): return site.replace("let state = {};", f"let state = {getState()};")
 
 def clock():
     global lastClock; now = time.time()

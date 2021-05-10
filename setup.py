@@ -1,18 +1,11 @@
 
 import os, flask, gpiozero, time, threading, json # just to make sure the environment has these packages
 
-def error(message):
-	print(f"{message}, aborting...")
-	exit()
+def error(message): print(f"{message}, aborting..."); exit()
 
 def replaceInFile(file, _from, _to):
-	f = open(file)
-	data = f.read().replace(str(_from), str(_to))
-	f.close()
-
-	f = open(file, "w")
-	f.write(data)
-	f.close()
+    with open(file) as f: data = f.read().replace(str(_from), str(_to))
+    with open(file, "w") as f: f.write(data)
 
 repoDir = "/home/pi/repos/garden"
 

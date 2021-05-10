@@ -166,12 +166,7 @@
 
 		const status = elem("status");
 		let lastClock = Date.now() / 1000;
-		let state = {
-			"value": 0, // 0: off, 1: on
-			"remaining": 0, // remaining seconds before switching off
-			"schedule": [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,0],
-			"scheduleDuration": 0
-		};
+		let state = {};
 
 	    const updateScheduleUI = () => {
 		    for (const hourWindow of range(24, 2))
@@ -223,6 +218,5 @@
 		sD1800.onclick = () => changeScheduleDuration(1800);
 
 		setInterval(() => get("state", false), 5000);
-		get("state", false);
 	</script>
 </html>
