@@ -1,0 +1,175 @@
+<html>
+	<head>
+		<title>Gardening stuff</title>
+		<link rel="stylesheet" href="https://www.w3schools.com/w3css/4/w3.css">
+                <meta name="viewport" content="width=device-width, initial-scale=1.0">
+		<style>
+			.timeButtons > button {
+				border-radius: 10px;
+				margin: 5px;
+			}
+
+			.scheduleTimes > div > button {
+				font-family: monospace;
+			}
+
+			.scheduleTimes > div {
+				margin: 5px 0;
+			}
+
+			.scheduleTimes {
+				margin-top: 15px;
+			}
+
+            #toast {
+                position: fixed;
+                max-width: 40vw;
+                top: 70vh;
+                left: 50vw;
+                transform: translateX(-50%);
+                background-color: #f0e68cff;
+                opacity: 0;
+                color: #111111ff;
+                transition: opacity 0.3s;
+                text-align: center;
+                padding: 8px 30px;
+                font-size: 1.5em;
+                z-index: 50000;
+                border-radius: 32px;
+                color: #111111 !important;
+            }
+
+            @media only screen and (max-width: 600px) {
+                #toast {
+                    top: unset;
+                    max-width: unset;
+                    transform: unset;
+                    border-radius: unset;
+                    font-size: 1em;
+                    width: 100vw;
+                    bottom: 0;
+                    left: 0;
+                }
+            }
+
+            #toast.activated {
+                opacity: 1;
+            }
+		</style>
+	</head>
+	<body style="padding: 20px">
+		<div class="timeButtons">
+			<button class="w3-btn w3-light-blue" onclick="turnOn(1800)">On</button>
+			<button class="w3-btn w3-red" onclick="turnOff()">Off</button>
+		</div>
+		<div class="timeButtons" style="margin-top: 30px">
+			<div>Status: <span id="status">Off</span></div>
+			<button class="w3-btn w3-light-blue" onclick="turnOn(10)">10 seconds</button>
+			<button class="w3-btn w3-light-blue" onclick="turnOn(60)">1 minute</button>
+			<button class="w3-btn w3-light-blue" onclick="turnOn(300)">5 minutes</button>
+			<button class="w3-btn w3-light-blue" onclick="turnOn(600)">10 minutes</button>
+			<button class="w3-btn w3-light-blue" onclick="turnOn(1800)">30 minutes</button>
+		</div>
+		<div class="timeButtons" style="margin-top: 30px">
+			<div>Schedule:</div>
+			<button class="w3-btn w3-grey" onclick="turnOn(300)">5 minutes</button>
+			<button class="w3-btn w3-grey" onclick="turnOn(600)">10 minutes</button>
+			<button class="w3-btn w3-light-green" onclick="turnOn(1800)">30 minutes</button>
+			<div class="scheduleTimes">
+				<div>
+					<button class="w3-btn w3-grey" onclick="toggleSchedule(0)">00:00</button>
+					<button class="w3-btn w3-grey" onclick="toggleSchedule(2)">02:00</button>
+					<button class="w3-btn w3-grey" onclick="toggleSchedule(4)">04:00</button>
+				</div>
+				<div>
+					<button class="w3-btn w3-grey" onclick="toggleSchedule(6)">06:00</button>
+					<button class="w3-btn w3-grey" onclick="toggleSchedule(8)">08:00</button>
+					<button class="w3-btn w3-grey" onclick="toggleSchedule(10)">10:00</button>
+				</div>
+				<div>
+					<button class="w3-btn w3-grey" onclick="toggleSchedule(12)">12:00</button>
+					<button class="w3-btn w3-grey" onclick="toggleSchedule(14)">14:00</button>
+					<button class="w3-btn w3-grey" onclick="toggleSchedule(16)">16:00</button>
+				</div>
+				<div>
+					<button class="w3-btn w3-grey" onclick="toggleSchedule(18)">18:00</button>
+					<button class="w3-btn w3-grey" onclick="toggleSchedule(20)">20:00</button>
+					<button class="w3-btn w3-grey" onclick="toggleSchedule(22)">22:00</button>
+				</div>
+			</div>
+		</div>
+		<div id="toast"></div>
+	</body>
+	<script>
+		/**
+		 * A simple pop up message, inspired by Android Studio's Toast. This is implemented so that it's dead simple, and you only
+		 * have to call .display(content) to display it.
+		 */
+		class Toast {
+			constructor() {
+				/** @type {number} this.instances */ this.instances = 0; // this is so that only the latest call's turnOff() will actually turn it off
+				/** @type {jQuery} this.objectReference */ this.objectReference = document.querySelector("#toast");
+			}
+
+			/**
+				* Displays toast with content.
+				*
+				* @param content
+				* @param {number} timeout Optional time out. Defaults to 3 seconds.
+				*/
+			display(content, timeout = 1000) {
+				this.instances++;
+				this.objectReference.innerHTML = content;
+				this.objectReference.classList.add("activated");
+				setTimeout(this.turnOff, timeout);
+			}
+
+			noInternet = (retrying) => (retrying ? this.display("No internet, retrying...") : this.display("No internet!"));
+			/** Displays a message, and keeps it online until another display() is called. */
+			persistTillNextDisplay = (content) => (this.objectReference.innerHTML = content, this.objectReference.classList.remove("activated"));
+			/** Fades out the toast. Expected to be called by a timeout only. */
+			turnOff = () => (((toast.instances === 1) ? toast.objectReference.classList.remove("activated") : ""), toast.instances--);
+		}
+
+        /** @type {Toast} toast */ const toast = new Toast();
+
+        const dev = true;
+		const status = document.querySelector("#status");
+		let lastClock = Date.now() / 1000;
+		let state = {
+			"value": 0, // 0: off, 1: on
+			"remaining": 0, // remaining seconds before switching off
+			"schedule": [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
+		};
+
+		setInterval(() => {
+			const now = Date.now() / 1000;
+			update({remaining: Math.max(state.remaining - (now - lastClock), -1)})
+			lastClock = now;
+		}, 1000);
+
+		const update = (_state) => {
+			state = {...state, ..._state}
+			if (state.remaining > 0) {
+				const minutes = Math.floor(state.remaining / 60)
+				const seconds = Math.floor(state.remaining % 60)
+				status.innerHTML = "On. Turns off in " + (minutes > 0 ? minutes + " minutes and " : "") + seconds + " seconds";
+			} else {
+				status.innerHTML = "Off";
+			}
+		}
+
+		const get = (url, retry=true) => {
+			fetch(url).then(response => response.json()).then(data => update(data)).catch((error) => {
+				if (!dev) {
+					toast.noInternet(retry);
+					if (retry) get(url, retry);
+				}
+			});
+		}
+		const turnOff = () => get("turnOff")
+		const turnOn = (seconds) => get("turnOn/" + seconds)
+		setInterval(() => get("state", false), 5000);
+		get("state", false);
+	</script>
+</html>
