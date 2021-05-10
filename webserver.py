@@ -17,10 +17,10 @@ L14 = LED(14); L15 = LED(15); L20 = LED(20); L21 = LED(21)
 def on(): state["value"] = 1; L14.on(); L15.on(); L20.on(); L21.on()
 def off(): state["value"] = 0; L14.off(); L15.off(); L20.off(); L21.off()
 def saveStore():
-	with open("store", "w") as f:
-		data = [elem for elem in state["schedule"]]
-		data.append(state["scheduleDuration"])
-		f.write(" ".join(data))
+    with open("store", "w") as f:
+        data = [elem for elem in state["schedule"]]
+        data.append(state["scheduleDuration"])
+        f.write(" ".join([str(elem) for elem in data]))
 
 off() # turn off after starting up
 
@@ -38,7 +38,7 @@ def turnOff():
     off(); return getState()
 
 @app.route("/changeSchedule/<int:hourWindow>")
-def changeSchedule(hourWindow, seconds):
+def changeSchedule(hourWindow):
 	state["schedule"][hourWindow] = 1 - state["schedule"][hourWindow]
 	saveStore(); return getState()
 
@@ -57,7 +57,7 @@ def clock():
     lastClock = now
 
     t = time.localtime()
-    if state["schedule"][t.tm_hour] == 1 and t.tm_min == 0 and t.tm_sec < 10:
+    if state["schedule"][t.tm_hour] == 1 and t.tm_min == 0 and t.tm_sec < 10 and state["scheduleDuration"] > 0:
     	turnOn(state["scheduleDuration"])
 
 def set_interval(func, seconds):
