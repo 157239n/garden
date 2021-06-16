@@ -4,7 +4,7 @@ python3 /home/pi/repos/garden/webserver.py &
 
 while true
 do
-	autossh -o "ServerAliveInterval 10" -o "ServerAliveCountMax 3" -o "ExitOnForwardFailure=yes" -N -R PORT:localhost:5000 SERVER
+	autossh -o "ServerAliveInterval 10" -o "ServerAliveCountMax 3" -o "ExitOnForwardFailure=yes" -R PORT:localhost:5000 SERVER sleep 600;
 	>&2 echo "autossh restarted"
 done
 
