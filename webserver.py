@@ -14,7 +14,8 @@ state = {
     "value": 0,
     "remaining": -1, # remaining seconds before switching off
     "schedule": store[:24],
-    "scheduleDuration": store[24]
+    "scheduleDuration": store[24],
+    "activatedTime": 0 # for total time on today
 }
 lastClock = time.time() # seconds
 with open("site.html") as f: site = f.read()
@@ -58,6 +59,7 @@ def getSite(): return site.replace("let state = {};", f"let state = {getState()}
 
 def clock():
     global lastClock; now = time.time()
+    if state["value"]: state["activatedTime"] += now - lastClock;
     state["remaining"] = max(state["remaining"] - (now - lastClock), -1)
     if state["remaining"] < 0: off()
     lastClock = now
@@ -65,6 +67,8 @@ def clock():
     t = time.localtime()
     if state["schedule"][t.tm_hour] == 1 and t.tm_min == 0 and t.tm_sec < 10 and state["scheduleDuration"] > 0:
     	turnOn(state["scheduleDuration"])
+    if t.tm_hour == 0 and t.tm_min == 0 and t.tm_sec < 10:
+        state["activatedTime"] = 0
 
 def set_interval(func, seconds):
     def wrapper(): set_interval(func, seconds); func()
