@@ -233,7 +233,7 @@
 		const changeSchedule = (hourWindow) => get("/changeSchedule/" + hourWindow);
 		const changeScheduleDuration = (seconds) => get("/changeScheduleDuration/" + seconds);
 
-		for (const hourWindow of range(24, 2)) 
+		for (const hourWindow of range(24)) 
 			s[hourWindow].onclick = () => changeSchedule(hourWindow);
 		sD0.onclick = () => changeScheduleDuration(0);
 		sD60.onclick = () => changeScheduleDuration(60);
