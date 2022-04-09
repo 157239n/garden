@@ -66,37 +66,51 @@
 			<div>Status: <span id="status">Off</span></div>
 			<button class="w3-btn w3-light-blue" onclick="turnOn(10)">10 seconds</button>
 			<button class="w3-btn w3-light-blue" onclick="turnOn(60)">1 minute</button>
+			<button class="w3-btn w3-light-blue" onclick="turnOn(120)">2 minute</button>
+			<button class="w3-btn w3-light-blue" onclick="turnOn(180)">3 minute</button>
 			<button class="w3-btn w3-light-blue" onclick="turnOn(300)">5 minutes</button>
-			<button class="w3-btn w3-light-blue" onclick="turnOn(600)">10 minutes</button>
-			<button class="w3-btn w3-light-blue" onclick="turnOn(1800)">30 minutes</button>
 		</div>
 		<div class="timeButtons" style="margin-top: 30px">
 			<div>Schedule:</div>
 			<button class="w3-btn w3-grey" id="sD60">1 minute</button>
+			<button class="w3-btn w3-grey" id="sD120">2 minute</button>
+			<button class="w3-btn w3-grey" id="sD180">3 minute</button>
 			<button class="w3-btn w3-grey" id="sD300">5 minutes</button>
-			<button class="w3-btn w3-grey" id="sD600">10 minutes</button>
-			<button class="w3-btn w3-grey" id="sD1800">30 minutes</button>
 			<button class="w3-btn w3-grey" id="sD0">Off</button>
 			<div class="scheduleTimes">
 				<div>
-					<button class="w3-btn w3-grey" id="s0">00:00</button>
-					<button class="w3-btn w3-grey" id="s2">02:00</button>
 					<button class="w3-btn w3-grey" id="s4">04:00</button>
-				</div>
-				<div>
+					<button class="w3-btn w3-grey" id="s5">05:00</button>
 					<button class="w3-btn w3-grey" id="s6">06:00</button>
-					<button class="w3-btn w3-grey" id="s8">08:00</button>
-					<button class="w3-btn w3-grey" id="s10">10:00</button>
 				</div>
 				<div>
-					<button class="w3-btn w3-grey" id="s12">12:00</button>
-					<button class="w3-btn w3-grey" id="s14">14:00</button>
+					<button class="w3-btn w3-grey" id="s7">07:00</button>
+					<button class="w3-btn w3-grey" id="s8">08:00</button>
+					<button class="w3-btn w3-grey" id="s9">09:00</button>
+				</div>
+				<div>
+					<button class="w3-btn w3-grey" id="s10">10:00</button>
 					<button class="w3-btn w3-grey" id="s16">16:00</button>
+					<button class="w3-btn w3-grey" id="s17">17:00</button>
 				</div>
 				<div>
 					<button class="w3-btn w3-grey" id="s18">18:00</button>
+					<button class="w3-btn w3-grey" id="s19">19:00</button>
 					<button class="w3-btn w3-grey" id="s20">20:00</button>
-					<button class="w3-btn w3-grey" id="s22">22:00</button>
+				</div>
+				<div style="display: none">
+					<button class="w3-btn w3-grey" id="s0">00:00</button>
+					<button class="w3-btn w3-grey" id="s1">00:00</button>
+					<button class="w3-btn w3-grey" id="s2">00:00</button>
+					<button class="w3-btn w3-grey" id="s3">00:00</button>
+					<button class="w3-btn w3-grey" id="s11">00:00</button>
+					<button class="w3-btn w3-grey" id="s12">00:00</button>
+					<button class="w3-btn w3-grey" id="s13">00:00</button>
+					<button class="w3-btn w3-grey" id="s14">00:00</button>
+					<button class="w3-btn w3-grey" id="s15">00:00</button>
+					<button class="w3-btn w3-grey" id="s21">00:00</button>
+					<button class="w3-btn w3-grey" id="s22">00:00</button>
+					<button class="w3-btn w3-grey" id="s23">00:00</button>
 				</div>
 			</div>
 		</div>
@@ -158,26 +172,26 @@
         }
         const sD0 = elem("sD0");
 		const sD60 = elem("sD60");
+		const sD120 = elem("sD120");
+		const sD180 = elem("sD180");
         const sD300 = elem("sD300");
-        const sD600 = elem("sD600");
-        const sD1800 = elem("sD1800");
         const s = [
-	        elem("s0"), 0, elem("s2"), 0, elem("s4"), 0, elem("s6"), 0,
-	        elem("s8"), 0, elem("s10"), 0, elem("s12"), 0, elem("s14"), 0,
-	        elem("s16"), 0, elem("s18"), 0, elem("s20"), 0, elem("s22"), 0]
+	        elem("s0"), elem("s1"), elem("s2"), elem("s3"), elem("s4"), elem("s5"), elem("s6"), elem("s7"),
+	        elem("s8"), elem("s9"), elem("s10"), elem("s11"), elem("s12"), elem("s13"), elem("s14"), elem("s15"),
+	        elem("s16"), elem("s17"), elem("s18"), elem("s19"), elem("s20"), elem("s21"), elem("s22"), elem("s23")]
 
 		const status = elem("status");
 		let lastClock = Date.now() / 1000;
 		let state = {};
 
 	    const updateScheduleUI = () => {
-		    for (const hourWindow of range(24, 2))
+		    for (const hourWindow of range(24))
 		    	s[hourWindow].changeStyles(state.schedule[hourWindow] === 1);
 		    sD0.changeStyles(state.scheduleDuration === 0);
 		    sD60.changeStyles(state.scheduleDuration === 60);
+		    sD120.changeStyles(state.scheduleDuration === 120);
+		    sD180.changeStyles(state.scheduleDuration === 180);
 		    sD300.changeStyles(state.scheduleDuration === 300);
-		    sD600.changeStyles(state.scheduleDuration === 600);
-		    sD1800.changeStyles(state.scheduleDuration === 1800);
 	    }
 	    updateScheduleUI();
 
@@ -217,9 +231,9 @@
 			s[hourWindow].onclick = () => changeSchedule(hourWindow);
 		sD0.onclick = () => changeScheduleDuration(0);
 		sD60.onclick = () => changeScheduleDuration(60);
+		sD120.onclick = () => changeScheduleDuration(120);
+		sD180.onclick = () => changeScheduleDuration(180);
 		sD300.onclick = () => changeScheduleDuration(300);
-		sD600.onclick = () => changeScheduleDuration(600);
-		sD1800.onclick = () => changeScheduleDuration(1800);
 
 		setInterval(() => get("state", false), 5000);
 	</script>
