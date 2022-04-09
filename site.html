@@ -114,6 +114,7 @@
 				</div>
 			</div>
 		</div>
+		<div style="margin-top: 30px">Activated time today: <span id="activatedTime">0 seconds</span></div>
 		<div id="toast"></div>
 	</body>
 	<script>
@@ -181,6 +182,7 @@
 	        elem("s16"), elem("s17"), elem("s18"), elem("s19"), elem("s20"), elem("s21"), elem("s22"), elem("s23")]
 
 		const status = elem("status");
+		const activatedTime = elem("activatedTime");
 		let lastClock = Date.now() / 1000;
 		let state = {};
 
@@ -201,17 +203,21 @@
 			lastClock = now;
 		}, 1000);
 
+		const formatTime = (seconds) => {
+			const minutes = Math.floor(seconds / 60)
+			seconds = Math.floor(seconds % 60)
+			return (minutes > 0 ? minutes + " minutes and " : "") + seconds + " seconds";
+		}
 		const update = (_state) => {
 			const scheduleChanged = !state.schedule.equals(_state.schedule);
 			state = {...state, ..._state}
 			if (scheduleChanged) updateScheduleUI();
 			if (state.remaining > 0) {
-				const minutes = Math.floor(state.remaining / 60)
-				const seconds = Math.floor(state.remaining % 60)
-				status.innerHTML = "On. Turns off in " + (minutes > 0 ? minutes + " minutes and " : "") + seconds + " seconds";
+				status.innerHTML = "On. Turns off in " + formatTime(state.remaining)
 			} else {
 				status.innerHTML = "Off";
 			}
+			activatedTime.innerHTML = formatTime(state["activatedTime"]);
 		}
 
 		const get = (url, retry=true) => {
