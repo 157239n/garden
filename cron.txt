@@ -1,5 +1,5 @@
 
-@reboot /home/pi/repos/garden/startup 2>/home/pi/repos/garden/cron.log
-
+@reboot /home/pi/repos/garden/startup 2>/home/pi/repos/garden/cron.log 1>&2
+@reboot /home/pi/repos/garden/rebootS 2>/home/pi/repos/garden/cron.log 1>&2
 
 
