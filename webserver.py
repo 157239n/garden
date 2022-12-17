@@ -49,7 +49,7 @@ def changeSchedule(pin, hourWindow):
     saveStore(); return getState()
 
 @app.route("/changeScheduleDuration/<int:pin>/<int:seconds>")
-def changeScheduleDuration(seconds):
+def changeScheduleDuration(pin, seconds):
     states[pin]["scheduleDuration"] = seconds
     saveStore(); return getState()
 
