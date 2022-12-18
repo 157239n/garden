@@ -57,15 +57,14 @@ def changeScheduleDuration(pin, seconds):
 def getSite(): return site.replace("let states = {};", f"let states = {getState()};")
 
 def clock():
-    global lastClock; now = time.time()
+    global lastClock; now = time.time(); t = time.localtime()
     for pin in pins:
         if states[pin]["value"]: states[pin]["activatedTime"] += now - lastClock;
         states[pin]["remaining"] = max(states[pin]["remaining"] - (now - lastClock), -1)
         if states[pin]["remaining"] < 0: off(pin)
 
-        t = time.localtime()
         if states[pin]["schedule"][t.tm_hour] == 1 and t.tm_min == 0 and t.tm_sec < 10 and states[pin]["scheduleDuration"] > 0:
-            turnOn(pin, states["scheduleDuration"])
+            turnOn(pin, states[pin]["scheduleDuration"])
         if t.tm_hour == 0 and t.tm_min == 0 and t.tm_sec < 10:
             states[pin]["activatedTime"] = 0
     lastClock = now
